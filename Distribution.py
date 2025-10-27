@@ -1,6 +1,8 @@
 from sys import argv
 from os import listdir
 from os.path import isfile, join, exists, isdir
+import matplotlib
+matplotlib.use('TkAgg')  # Configurer le backend
 import matplotlib.pyplot as plt
 
 
@@ -19,25 +21,26 @@ def analyze_subdirectories(directory):
     return subdirectories
 
 
-def plot_distribution(subdirectories):
-    fig, ax = plt.subplots()
-    values = list(subdirectories.values())
-    labels = list(subdirectories.keys())
+def plot_distribution(subdirectories, directory):
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))  # 1 ligne, 2 colonnes
+    values = list(subdirectories.values()) # number of pics in the folder
+    labels = list(subdirectories.keys()) # name of the folder
     if not values:
         print("No subdirectories to plot")
     else:
         if sum(values) == 0:
             print("Found subdirectories but no images to plot")
         else:
-            ax.pie(values, labels=labels)
-            plt.show()
-    if not values:
-        print("No subdirectories to plot")
-    else:
-        if sum(values) == 0:
-            print("Found subdirectories but no images to plot")
-        else:
-            ax.pie(values, labels=labels)
+            axes[0].pie(values, labels=labels, autopct='%1.1f%%')
+            # axes[0].set_title(directory)
+            
+            axes[1].bar(labels, values)
+            # axes[1].set_title(directory)
+            axes[1].set_xlabel('Folders')
+            axes[1].set_ylabel('Number of Images')
+            
+            plt.title(directory)
+            plt.tight_layout()
             plt.show()
 
 
@@ -50,4 +53,4 @@ if __name__ == "__main__":
         print(f"The directory {directory} does not exist.")
         exit(1)
     subdirectories = analyze_subdirectories(directory)
-    plot_distribution(subdirectories)
+    plot_distribution(subdirectories, directory)
