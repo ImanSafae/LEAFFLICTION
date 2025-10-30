@@ -11,6 +11,24 @@ def blur_image(image: Image):
     img_blurred = image.filter(filter=ImageFilter.BoxBlur(15))
     name, ext = splitext(image.filename)
     img_blurred.save(name + "_Blur" + ext)
+
+def zoom_into_image(image: Image):
+    initial_width, initial_heigth = image.size
+    width_offset = (initial_width * 0.8) / 2
+    heigth_offset = (initial_heigth * 0.8) / 2
+    new_left = width_offset
+    new_right = initial_width - width_offset
+    new_top = heigth_offset
+    new_bottom = initial_heigth - heigth_offset
+    new_size = (initial_width * 0.8, initial_heigth * 0.8)
+    img_zoomed = image.crop((new_left, new_top, new_right, new_bottom))
+    img_zoomed = img_zoomed.resize(new_size)
+    name, ext = splitext(image.filename)
+    img_zoomed.save(name + "_Zoom" + ext)
+
+
+
+
     
 
 if __name__ == "__main__":
@@ -27,5 +45,6 @@ if __name__ == "__main__":
     with Image.open(pic) as img:
         rotate_image(img)
         blur_image(img)
+        zoom_into_image(img)
     
     
