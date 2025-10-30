@@ -1,6 +1,7 @@
 import argparse
 from os.path import isfile, join, exists, isdir, splitext
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageEnhance
+import math
 
 def rotate_image(image: Image):
     img_rotated = image.rotate(60)
@@ -14,22 +15,36 @@ def blur_image(image: Image):
 
 def zoom_into_image(image: Image):
     initial_width, initial_heigth = image.size
-    width_offset = (initial_width * 0.8) / 2
-    heigth_offset = (initial_heigth * 0.8) / 2
+    width_offset = (initial_width * 0.5) / 2
+    heigth_offset = (initial_heigth * 0.5) / 2
     new_left = width_offset
     new_right = initial_width - width_offset
     new_top = heigth_offset
     new_bottom = initial_heigth - heigth_offset
-    new_size = (initial_width * 0.8, initial_heigth * 0.8)
+    # new_size = (math.floor(initial_width * 0.7), math.floor(initial_heigth * 0.7))
     img_zoomed = image.crop((new_left, new_top, new_right, new_bottom))
-    img_zoomed = img_zoomed.resize(new_size)
+    # img_zoomed = img_zoomed.resize(new_size)
     name, ext = splitext(image.filename)
     img_zoomed.save(name + "_Zoom" + ext)
 
 
+def flip_image(image: Image):
+    img_flipped = image.transpose(method=Image.Transpose.FLIP_LEFT_RIGHT)
+    name, ext = splitext(image.filename)
+    img_flipped.save(name + "_Flip" + ext)
 
+def illuminate_image(image: Image):
+    enhancer = ImageEnhance.Brightness(image)
+    img_illuminated = enhancer.enhance(1.5)
+    name, ext = splitext(image.filename)
+    img_illuminated.save(name + "_Illuminate" + ext)
 
-    
+def contrast_image(image):
+    enhancer = ImageEnhance.Contrast(image)
+    img_contrasted = enhancer.enhance(2)
+    name, ext = splitext(image.filename)
+    img_contrasted.save(name + "_Contrast" + ext)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='Augmentation.py',
@@ -46,5 +61,8 @@ if __name__ == "__main__":
         rotate_image(img)
         blur_image(img)
         zoom_into_image(img)
+        flip_image(img)
+        illuminate_image(img)
+        contrast_image(img)
     
     
