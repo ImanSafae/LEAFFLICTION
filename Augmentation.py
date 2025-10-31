@@ -27,7 +27,6 @@ def zoom_into_image(image: Image):
     name, ext = splitext(image.filename)
     img_zoomed.save(name + "_Zoom" + ext)
 
-
 def flip_image(image: Image):
     img_flipped = image.transpose(method=Image.Transpose.FLIP_LEFT_RIGHT)
     name, ext = splitext(image.filename)
@@ -44,7 +43,6 @@ def contrast_image(image):
     img_contrasted = enhancer.enhance(2)
     name, ext = splitext(image.filename)
     img_contrasted.save(name + "_Contrast" + ext)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='Augmentation.py',
