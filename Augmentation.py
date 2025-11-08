@@ -1,5 +1,5 @@
 import argparse
-from os.path import isfile, join, exists, isdir, splitext
+from os.path import exists, splitext
 from PIL import Image, ImageFilter, ImageEnhance
 import math
 
