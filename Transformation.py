@@ -1,45 +1,51 @@
 import argparse
 import cv2
 from plantcv import plantcv as pcv
-from os.path import exists, splitext
+from os.path import exists, splitext, join, isdir, isfile, basename, normpath
+from os import listdir, makedirs
 
-def threshold_image(image: str):
+def threshold_image(image: str, outdir=None):
     color_img, imgpath, imgname = pcv.readimage(image)
     grayscale_img = pcv.rgb2gray_lab(color_img, "l")
     thresholded_img = pcv.threshold.otsu(grayscale_img, "light")
     name, ext = splitext(imgname)
-    pcv.print_image(thresholded_img, name + "_Threshold" + ext)
+    output_path = join(outdir, name + "_Threshold" + ext) if outdir else name + "_Threshold" + ext
+    pcv.print_image(thresholded_img, output_path)
 
-def canny_edge_detection(image: str):
+def canny_edge_detection(image: str, outdir=None):
     color_img, imgpath, imgname = pcv.readimage(image)
     edges = pcv.canny_edge_detect(color_img,  sigma=1.3)
     name, ext = splitext(imgname)
-    pcv.print_image(edges, name + "_Edges" + ext)
+    output_path = join(outdir, name + "_Edges" + ext) if outdir else name + "_Edges" + ext
+    pcv.print_image(edges, output_path)
 
-def analyze_size_and_shape(image: str):
+def analyze_size_and_shape(image: str, outdir=None):
     color_img, imgpath, imgname = pcv.readimage(image)
     pcv.params.line_thickness = 1
     grayscale_img = pcv.rgb2gray_lab(color_img, "l")
     thresholded_img = pcv.threshold.otsu(grayscale_img, "light")
     analyzed_img = pcv.analyze.size(color_img, thresholded_img)
     name, ext = splitext(imgname)
-    pcv.print_image(analyzed_img, name + "_Analyzed" + ext)
+    output_path = join(outdir, name + "_Analyzed" + ext) if outdir else name + "_Analyzed" + ext
+    pcv.print_image(analyzed_img, output_path)
 
-def gaussian_blur(image: str):
+def gaussian_blur(image: str, outdir=None):
     color_img, imgpath, imgname = pcv.readimage(image)
     blurred_img = pcv.gaussian_blur(color_img, (7, 7), 0)
     name, ext = splitext(imgname)
-    pcv.print_image(blurred_img, name + "_Blurred" + ext)
+    output_path = join(outdir, name + "_Blurred" + ext) if outdir else name + "_Blurred" + ext
+    pcv.print_image(blurred_img, output_path)
 
-def isolate_from_bg(image_path):
+def isolate_from_bg(image_path, outdir=None):
     img, path, filename = pcv.readimage(image_path)
     s = pcv.rgb2gray_hsv(rgb_img=img, channel='s')
     mask = pcv.threshold.otsu(gray_img=s, object_type='light')
     masked = pcv.apply_mask(img=img, mask=mask, mask_color='white')
     name, ext = splitext(filename)
-    pcv.print_image(masked, name + "_Isolated" + ext)
+    output_path = join(outdir, name + "_Isolated" + ext) if outdir else name + "_Isolated" + ext
+    pcv.print_image(masked, output_path)
 
-def pseudolandmarks(image_path):
+def pseudolandmarks(image_path, outdir=None):
     img, path, filename = pcv.readimage(image_path)
     s = pcv.rgb2gray_hsv(img, channel='s')
     mask = pcv.threshold.otsu(s, object_type='light')
@@ -61,22 +67,43 @@ def pseudolandmarks(image_path):
                 x, y = int(pt[0][0]), int(pt[0][1])
                 cv2.circle(landmark_img, (x, y), 3, color, -1)
                 cv2.circle(landmark_img, (x, y), 4, (255, 255, 255), 1)
-    
     name, ext = splitext(filename)
-    pcv.print_image(landmark_img, name + '_Pseudolandmarks' + ext)
+    output_path = join(outdir, name + '_Pseudolandmarks' + ext) if outdir else name + '_Pseudolandmarks' + ext
+    pcv.print_image(landmark_img, output_path)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog="Transformation.py", usage='%(prog)s [path to a picture]')
-    parser.add_argument("pic_path")
+    parser = argparse.ArgumentParser(prog="Transformation.py")
+    parser.add_argument("-src", required=True, help="Path to an image or directory")
+    parser.add_argument("-dst", help="Destination directory for batch processing")
     args = parser.parse_args()
-    pic = args.pic_path
-    if (not exists(pic) or not pic.lower().endswith((".jpg", ".jpeg", ".png"))):
-        print("Provided argument should be a path to a picture.")
+    src = args.src
+    if not exists(src):
+        print(f"Path {src} does not exist.")
         exit(1)
-    threshold_image(pic)
-    canny_edge_detection(pic)
-    analyze_size_and_shape(pic)
-    gaussian_blur(pic)
-    pseudolandmarks(pic)
-    isolate_from_bg(pic)
+    if isfile(src) and src.lower().endswith((".jpg", ".jpeg", ".png")):
+        threshold_image(src)
+        canny_edge_detection(src)
+        analyze_size_and_shape(src)
+        gaussian_blur(src)
+        pseudolandmarks(src)
+        isolate_from_bg(src)
+    elif isdir(src):
+        if not args.dst:
+            print("Destination directory (-dst) is required when processing a directory.")
+            exit(1)
+        source_folder_name = basename(normpath(src))
+        output_dir = join(args.dst, source_folder_name)
+        makedirs(output_dir, exist_ok=True)
+        for filename in listdir(src):
+            if filename.lower().endswith((".jpg", ".jpeg", ".png")):
+                image_path = join(src, filename)
+                threshold_image(image_path, output_dir)
+                canny_edge_detection(image_path, output_dir)
+                analyze_size_and_shape(image_path, output_dir)
+                gaussian_blur(image_path, output_dir)
+                pseudolandmarks(image_path, output_dir)
+                isolate_from_bg(image_path, output_dir)
+    else:
+        print("Source must be an image file or a directory.")
+        exit(1)

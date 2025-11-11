@@ -46,21 +46,22 @@ def contrast_image(image):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='Augmentation.py',
-                                     usage='%(prog)s [path to a picture]',
-                                     description='Displays and creates 6 new augmented versions of the provided picture.')
+                                     usage='%(prog)s [path to a picture] [-n COUNT]',
+                                     description='Displays and creates augmented versions of the provided picture.')
     parser.add_argument("pic_path")
+    parser.add_argument("-n", type=int, default=6, help="Number of augmentations to create (default: 6)")
     args = parser.parse_args()
     pic = args.pic_path
     print("Pic:", pic)
     if (not exists(pic) or not pic.lower().endswith((".jpg", ".jpeg", ".png"))):
         print("Provided argument should be a path to a picture.")
         exit(1)
+    
+    augmentations = [rotate_image, blur_image, zoom_into_image, flip_image, illuminate_image, contrast_image]
+    num_to_create = min(args.n, len(augmentations))
+    
     with Image.open(pic) as img:
-        rotate_image(img)
-        blur_image(img)
-        zoom_into_image(img)
-        flip_image(img)
-        illuminate_image(img)
-        contrast_image(img)
+        for i in range(num_to_create):
+            augmentations[i](img)
     
     

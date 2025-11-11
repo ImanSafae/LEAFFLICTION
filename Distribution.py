@@ -38,8 +38,12 @@ def plot_distribution(subdirectories, directory):
             # axes[1].set_title(directory)
             axes[1].set_xlabel('Folders')
             axes[1].set_ylabel('Number of Images')
+            # Rotation des labels pour éviter les chevauchements
+            axes[1].tick_params(axis='x', rotation=45)
+            # Alignement à droite pour meilleure lisibilité
+            plt.setp(axes[1].xaxis.get_majorticklabels(), rotation=45, ha='right')
             
-            plt.title(directory)
+            plt.suptitle("Distribution in folder \"{}\"".format(directory))
             plt.tight_layout()
             plt.show()
 
