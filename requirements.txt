@@ -1,3 +1,6 @@
 matplotlib
 plantcv
 opencv-python
+tensorflow
+tensorflow.keras
+flake8
