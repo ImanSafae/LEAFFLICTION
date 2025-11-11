@@ -2,8 +2,8 @@ from sys import argv
 from os import listdir
 from os.path import isfile, join, exists, isdir
 import matplotlib
-matplotlib.use('TkAgg')  # Configurer le backend
 import matplotlib.pyplot as plt
+matplotlib.use('TkAgg')  # Configurer le backend
 
 
 def analyze_subdirectories(directory):
@@ -23,8 +23,8 @@ def analyze_subdirectories(directory):
 
 def plot_distribution(subdirectories, directory):
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))  # 1 ligne, 2 colonnes
-    values = list(subdirectories.values()) # number of pics in the folder
-    labels = list(subdirectories.keys()) # name of the folder
+    values = list(subdirectories.values())  # number of pics in the folder
+    labels = list(subdirectories.keys())  # name of the folder
     if not values:
         print("No subdirectories to plot")
     else:
@@ -33,7 +33,6 @@ def plot_distribution(subdirectories, directory):
         else:
             axes[0].pie(values, labels=labels, autopct='%1.1f%%')
             # axes[0].set_title(directory)
-            
             axes[1].bar(labels, values)
             # axes[1].set_title(directory)
             axes[1].set_xlabel('Folders')
@@ -41,8 +40,8 @@ def plot_distribution(subdirectories, directory):
             # Rotation des labels pour éviter les chevauchements
             axes[1].tick_params(axis='x', rotation=45)
             # Alignement à droite pour meilleure lisibilité
-            plt.setp(axes[1].xaxis.get_majorticklabels(), rotation=45, ha='right')
-            
+            plt.setp(axes[1].xaxis.get_majorticklabels(),
+                     rotation=45, ha='right')
             plt.suptitle("Distribution in folder \"{}\"".format(directory))
             plt.tight_layout()
             plt.show()
