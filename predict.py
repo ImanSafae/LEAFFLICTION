@@ -3,6 +3,7 @@ import os
 import numpy as np
 from tensorflow import keras
 from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 import matplotlib.pyplot as plt
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -25,6 +26,7 @@ def predict_image(image_path, model_path, class_names,
 
     img = image.load_img(image_path, target_size=(img_height, img_width))
     img_array = image.img_to_array(img)
+    img_array = preprocess_input(img_array)
     img_array = np.expand_dims(img_array, axis=0)
 
     predictions = model.predict(img_array, verbose=0)

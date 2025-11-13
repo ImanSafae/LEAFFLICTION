@@ -58,7 +58,7 @@ def plot_training_history(history, output_dir):
     print("Training history plot saved to " + msg)
 
 
-def train_model(data_dir, output_dir, epochs=50,
+def train_model(data_dir, output_dir, epochs=10,
                 img_height=224, img_width=224):
     os.makedirs(output_dir, exist_ok=True)
 
@@ -137,7 +137,7 @@ def train_model(data_dir, output_dir, epochs=50,
             restore_best_weights=True,
             verbose=0
         ),
-        StopAt90Percent()
+        # StopAt90Percent()
     ]
 
     print("\nStarting training...")
